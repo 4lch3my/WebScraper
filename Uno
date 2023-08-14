@@ -1,0 +1,37 @@
+# The script will grab the .html of the site, read, copy and extract everything between <!-- MAIN START --> & <!-- MAIN END -->
+# Modify the "if __name__ == "__main__":" to your desired data extraction.
+# USAGE: python3 Uno.py > output.txt
+# Script used for single HTML grab-point only!
+
+import requests
+from bs4 import BeautifulSoup
+
+def extract_text_between_comments(html_content, start_comment, end_comment):
+    start_index = html_content.find(start_comment)
+    end_index = html_content.find(end_comment, start_index)
+
+    if start_index != -1 and end_index != -1:
+        return html_content[start_index + len(start_comment):end_index].strip()
+    else:
+        return None
+
+if __name__ == "__main__":
+    url = "http://example.com/"  # Replace with the URL of the webpage you want to extract from
+    start_comment = "<!-- MAIN START -->"
+    end_comment = "<!-- MAIN END -->"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        html_content = response.text
+        extracted_html = extract_text_between_comments(html_content, start_comment, end_comment)
+
+        if extracted_html:
+            soup = BeautifulSoup(extracted_html, 'html.parser')
+            extracted_text = soup.get_text()
+            print("Extracted plain text between comments:")
+            print(extracted_text)
+        else:
+            print("No text found between the specified comments.")
+    else:
+        print(f"Failed to retrieve the webpage. Status code: {response.status_code}")
